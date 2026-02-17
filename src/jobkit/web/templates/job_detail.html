@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} - JobKit{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <div class="flex justify-between items-start">
+        <div>
+            <h1 class="text-2xl font-bold">{{ job.title }}</h1>
+            <p class="text-xl text-gray-700">{{ job.company }}</p>
+            <p class="text-gray-500">{{ job.location }}</p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="generateApplication('{{ job.id }}')"
+                    class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                Generate Application
+            </button>
+            {% if job.url %}
+            <a href="{{ job.url }}" target="_blank"
+               class="border px-4 py-2 rounded-lg hover:bg-gray-50">
+                View Original →
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-4">Job Description</h2>
+        <div class="prose max-w-none whitespace-pre-wrap text-gray-700">{{ job.description }}</div>
+    </div>
+
+    <div class="bg-gray-100 rounded-lg p-4 text-sm text-gray-600">
+        <p><strong>Job ID:</strong> {{ job.id }}</p>
+        <p><strong>Source:</strong> {{ job.source or 'LinkedIn' }}</p>
+        <p><strong>Saved:</strong> {{ job.scraped_at }}</p>
+    </div>
+</div>
+
+<!-- Generation Modal -->
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div id="modal-content">
+            <div class="flex items-center justify-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <span class="ml-3">Generating application...</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function generateApplication(jobId) {
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modal-content');
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    try {
+        const response = await fetch(`/generate/${jobId}`, { method: 'POST' });
+        const data = await response.json();
+
+        if (data.error) {
+            modalContent.innerHTML = `
+                <div class="text-red-600">
+                    <p class="font-bold">Error</p>
+                    <p>${data.error}</p>
+                    <button onclick="closeModal()" class="mt-4 bg-gray-200 px-4 py-2 rounded">Close</button>
+                </div>
+            `;
+        } else {
+            modalContent.innerHTML = `
+                <div class="text-green-600">
+                    <p class="font-bold text-lg">✓ Application Generated!</p>
+                    <div class="mt-4 flex gap-2">
+                        <a href="/applications/${encodeURIComponent(data.folder)}"
+                           class="bg-primary text-white px-4 py-2 rounded">View Application</a>
+                        <button onclick="closeModal()" class="bg-gray-200 px-4 py-2 rounded">Close</button>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (error) {
+        modalContent.innerHTML = `
+            <div class="text-red-600">
+                <p class="font-bold">Error</p>
+                <p>${error.message}</p>
+                <button onclick="closeModal()" class="mt-4 bg-gray-200 px-4 py-2 rounded">Close</button>
+            </div>
+        `;
+    }
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+    document.getElementById('modal').classList.remove('flex');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}JobKit{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .markdown-body h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .markdown-body h2 { font-size: 1.25rem; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; color: #2563eb; }
+        .markdown-body h3 { font-size: 1.1rem; font-weight: bold; margin-top: 0.75rem; }
+        .markdown-body p { margin: 0.5rem 0; }
+        .markdown-body ul { list-style-type: disc; margin-left: 1.5rem; }
+        .markdown-body li { margin: 0.25rem 0; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-primary">JobKit</a>
+                    <span class="ml-2 text-sm text-gray-500">AI-Powered Job Applications</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-600 hover:text-primary px-3 py-2">Dashboard</a>
+                    <a href="/jobs" class="text-gray-600 hover:text-primary px-3 py-2">Jobs</a>
+                    <a href="/profile" class="text-gray-600 hover:text-primary px-3 py-2">Profile</a>
+                    <a href="/settings" class="text-gray-600 hover:text-primary px-3 py-2">Settings</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-4 text-center text-gray-500 text-sm">
+            JobKit - Open Source AI Job Application Toolkit |
+            <a href="https://github.com/yourusername/jobkit" class="text-primary hover:underline">GitHub</a>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

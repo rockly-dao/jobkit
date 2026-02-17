@@ -1,0 +1,15 @@
+# Core dependencies
+playwright>=1.40.0
+flask>=3.0.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# LLM providers (optional - install based on your preference)
+anthropic>=0.18.0
+openai>=1.12.0
+
+# Development dependencies
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=24.0.0
+ruff>=0.2.0

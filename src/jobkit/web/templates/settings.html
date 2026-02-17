@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - JobKit{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6">Settings</h1>
+
+    <form method="POST" class="space-y-6">
+        <div class="bg-white rounded-lg shadow p-6 space-y-4">
+            <h2 class="text-lg font-semibold border-b pb-2">Job Search Defaults</h2>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Keywords</label>
+                <input type="text" name="keywords" value="{{ config.search.keywords }}"
+                       class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary"
+                       placeholder="software engineer">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <input type="text" name="location" value="{{ config.search.location }}"
+                       class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary"
+                       placeholder="Remote">
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 space-y-4">
+            <h2 class="text-lg font-semibold border-b pb-2">AI Settings</h2>
+            <p class="text-gray-600 text-sm">Configure the LLM used for generating resumes and cover letters.</p>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Provider</label>
+                <select name="llm_provider"
+                        class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary">
+                    <option value="ollama" {% if config.llm.provider == 'ollama' %}selected{% endif %}>
+                        Ollama (Local - Free)
+                    </option>
+                    <option value="anthropic" {% if config.llm.provider == 'anthropic' %}selected{% endif %}>
+                        Anthropic Claude (API Key Required)
+                    </option>
+                    <option value="openai" {% if config.llm.provider == 'openai' %}selected{% endif %}>
+                        OpenAI GPT (API Key Required)
+                    </option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                <input type="text" name="llm_model" value="{{ config.llm.model }}"
+                       class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary"
+                       placeholder="llama3">
+                <p class="text-gray-500 text-sm mt-1">
+                    For Ollama: llama3, mistral, etc. For Claude: claude-sonnet-4-20250514. For OpenAI: gpt-4.
+                </p>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-blue-800 text-sm">
+                    <strong>Using Ollama (recommended for free usage):</strong><br>
+                    1. Install Ollama: <code class="bg-blue-100 px-1 rounded">brew install ollama</code><br>
+                    2. Pull a model: <code class="bg-blue-100 px-1 rounded">ollama pull llama3</code><br>
+                    3. Start Ollama: <code class="bg-blue-100 px-1 rounded">ollama serve</code>
+                </p>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+            <a href="/" class="px-6 py-2 border rounded-lg hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700">
+                Save Settings
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

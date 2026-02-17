@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ name }} - JobKit{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold">{{ name }}</h1>
+        <a href="/" class="text-primary hover:underline">← Back to Dashboard</a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Resume -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="border-b px-6 py-4 flex justify-between items-center">
+                <h2 class="text-lg font-semibold">Resume</h2>
+                <button onclick="copyToClipboard('resume')" class="text-primary hover:underline text-sm">
+                    Copy
+                </button>
+            </div>
+            <div id="resume" class="p-6 markdown-body whitespace-pre-wrap text-sm overflow-auto max-h-[600px]">{{ resume }}</div>
+        </div>
+
+        <!-- Cover Letter -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="border-b px-6 py-4 flex justify-between items-center">
+                <h2 class="text-lg font-semibold">Cover Letter</h2>
+                <button onclick="copyToClipboard('cover-letter')" class="text-primary hover:underline text-sm">
+                    Copy
+                </button>
+            </div>
+            <div id="cover-letter" class="p-6 markdown-body whitespace-pre-wrap text-sm overflow-auto max-h-[600px]">{{ cover_letter }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyToClipboard(elementId) {
+    const text = document.getElementById(elementId).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}
