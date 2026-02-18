@@ -49,10 +49,10 @@ dev = [
 jobkit = "jobkit.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/jobkit/jobkit"
-Documentation = "https://github.com/jobkit/jobkit#readme"
-Repository = "https://github.com/jobkit/jobkit"
-Issues = "https://github.com/jobkit/jobkit/issues"
+Homepage = "https://rockly-dao.github.io/jobkit"
+Documentation = "https://rockly-dao.github.io/jobkit"
+Repository = "https://github.com/rockly-dao/jobkit"
+Issues = "https://github.com/rockly-dao/jobkit/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
