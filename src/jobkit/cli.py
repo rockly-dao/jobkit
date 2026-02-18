@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from .config import load_config, save_config
+from .config import get_config, Config
 from .scrapers.linkedin import LinkedInScraper
 
 
@@ -50,7 +50,7 @@ def main():
         parser.print_help()
         sys.exit(0)
 
-    config = load_config()
+    config = get_config()
 
     if args.command == "search":
         cmd_search(config, args)
@@ -212,12 +212,12 @@ def cmd_generate(config, args):
 
 def cmd_web(config, args):
     """Start the web interface."""
-    from .web.app import create_app
+    from .web.app import run_server
 
-    app = create_app(config)
     print(f"\nStarting JobKit web interface at http://{args.host}:{args.port}")
     print("Press Ctrl+C to stop\n")
-    app.run(host=args.host, port=args.port, debug=True)
+    # debug=False to avoid issues with threading/reloader
+    run_server(host=args.host, port=args.port, debug=False)
 
 
 def cmd_config(config, args):
@@ -233,4 +233,7 @@ def cmd_config(config, args):
 
 
 if __name__ == "__main__":
+    # Required for multiprocessing on macOS
+    import multiprocessing
+    multiprocessing.set_start_method('spawn', force=True)
     main()

@@ -34,13 +34,52 @@ RESUME_PROMPT_TEMPLATE = """Create a tailored resume for the following job:
 
 ## Instructions
 Create a professional resume tailored for this specific role.
+- Start with the candidate's name as a top heading
+- Include contact info (email, phone) directly below the name if available in background
+- Use section headers for: Summary, Experience, Skills, Education
 - Emphasize experience and skills that match the job requirements
 - Highlight relevant achievements with metrics where possible
 - Keep it concise and scannable
-- Format as clean markdown
+- Use bullet points for achievements and responsibilities
 
-Output ONLY the resume content in markdown format, no additional commentary.
+FORMAT:
+- Use ## for section headers (Experience, Skills, Education, etc.)
+- Use **bold** for company names, job titles, and key achievements
+- Use bullet points (-) for listing accomplishments
+- Start with # for the candidate's name as the main heading
+
+CRITICAL:
+- Output ONLY the resume itself. Do NOT include any preamble like "Here is a resume".
+- Do NOT wrap in code blocks or use triple backticks.
+- Start DIRECTLY with the candidate's name.
+- Spell the candidate's name EXACTLY as shown in the background.
+- Include email and phone from the background if available.
 """
+
+
+def clean_llm_output(text: str) -> str:
+    """Remove common LLM artifacts from generated text."""
+    import re
+
+    # Remove markdown code blocks
+    text = re.sub(r'^```(?:markdown)?\s*\n?', '', text)
+    text = re.sub(r'\n?```\s*$', '', text)
+
+    # Remove common preambles
+    preambles = [
+        r'^Here is (?:a |the )?(?:tailored |professional )?resume.*?:\s*\n*',
+        r'^Here\'s (?:a |the )?(?:tailored |professional )?resume.*?:\s*\n*',
+        r'^I\'ve (?:written|created|drafted).*?:\s*\n*',
+        r'^Below is.*?:\s*\n*',
+        r'^The following is.*?:\s*\n*',
+    ]
+    for pattern in preambles:
+        text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+
+    # Remove lines that are just ## or ###
+    text = re.sub(r'\n#+\s*\n', '\n\n', text)
+
+    return text.strip()
 
 
 class ResumeGenerator:
@@ -66,7 +105,8 @@ class ResumeGenerator:
         if additional_instructions:
             prompt += f"\n\n## Additional Instructions\n{additional_instructions}"
 
-        return self.llm.generate(prompt, system_prompt=RESUME_SYSTEM_PROMPT)
+        result = self.llm.generate(prompt, system_prompt=RESUME_SYSTEM_PROMPT)
+        return clean_llm_output(result)
 
     def save(self, content: str, output_path: Path) -> Path:
         """Save resume to file."""

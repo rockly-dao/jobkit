@@ -1,0 +1,10 @@
+title: JobKit
+description: Open source AI-powered job hunting toolkit
+theme: jekyll-theme-cayman
+
+# Optional - customize colors
+show_downloads: true
+google_analytics:
+
+# GitHub metadata
+repository: rocky-dao/jobkit

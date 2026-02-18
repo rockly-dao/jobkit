@@ -18,6 +18,7 @@ Guidelines:
 - Keep to 3-4 paragraphs maximum
 - Be specific, not generic
 - End with a clear call to action
+- Pay careful attention to spelling names correctly
 """
 
 COVER_LETTER_PROMPT_TEMPLATE = """Create a tailored cover letter for the following job:
@@ -39,9 +40,41 @@ Write a compelling cover letter that:
 3. Shows understanding of the company and what they need
 4. Closes with confidence and a call to action
 
-Output ONLY the cover letter content in markdown format, no additional commentary.
-Start with "Dear Hiring Team at {company}," or appropriate greeting.
+FORMAT:
+- Use **bold** for key skills, achievements, and important phrases you want to highlight
+- Keep paragraphs clean and readable
+
+CRITICAL:
+- Output ONLY the cover letter itself. Do NOT include any preamble like "Here is a cover letter" or "I've written".
+- Do NOT wrap in code blocks or use triple backticks.
+- Start DIRECTLY with "Dear Hiring Team," or similar greeting.
+- Spell the candidate's name EXACTLY as shown in the background.
 """
+
+
+def clean_llm_output(text: str) -> str:
+    """Remove common LLM artifacts from generated text."""
+    import re
+
+    # Remove markdown code blocks
+    text = re.sub(r'^```(?:markdown)?\s*\n?', '', text)
+    text = re.sub(r'\n?```\s*$', '', text)
+
+    # Remove common preambles
+    preambles = [
+        r'^Here is (?:a |the )?(?:tailored |professional )?cover letter.*?:\s*\n*',
+        r'^Here\'s (?:a |the )?(?:tailored |professional )?cover letter.*?:\s*\n*',
+        r'^I\'ve (?:written|created|drafted).*?:\s*\n*',
+        r'^Below is.*?:\s*\n*',
+        r'^The following is.*?:\s*\n*',
+    ]
+    for pattern in preambles:
+        text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+
+    # Remove lines that are just ## or ###
+    text = re.sub(r'\n#+\s*\n', '\n\n', text)
+
+    return text.strip()
 
 
 class CoverLetterGenerator:
@@ -67,7 +100,8 @@ class CoverLetterGenerator:
         if additional_instructions:
             prompt += f"\n\n## Additional Instructions\n{additional_instructions}"
 
-        return self.llm.generate(prompt, system_prompt=COVER_LETTER_SYSTEM_PROMPT)
+        result = self.llm.generate(prompt, system_prompt=COVER_LETTER_SYSTEM_PROMPT)
+        return clean_llm_output(result)
 
     def save(self, content: str, output_path: Path) -> Path:
         """Save cover letter to file."""

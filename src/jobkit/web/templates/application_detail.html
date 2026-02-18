@@ -14,9 +14,15 @@
         <div class="bg-white rounded-lg shadow">
             <div class="border-b px-6 py-4 flex justify-between items-center">
                 <h2 class="text-lg font-semibold">Resume</h2>
-                <button onclick="copyToClipboard('resume')" class="text-primary hover:underline text-sm">
-                    Copy
-                </button>
+                <div class="flex gap-3">
+                    <button onclick="copyToClipboard('resume')" class="text-primary hover:underline text-sm">
+                        Copy
+                    </button>
+                    <a href="/applications/{{ name }}/download/resume"
+                       class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                        Download PDF
+                    </a>
+                </div>
             </div>
             <div id="resume" class="p-6 markdown-body whitespace-pre-wrap text-sm overflow-auto max-h-[600px]">{{ resume }}</div>
         </div>
@@ -25,9 +31,15 @@
         <div class="bg-white rounded-lg shadow">
             <div class="border-b px-6 py-4 flex justify-between items-center">
                 <h2 class="text-lg font-semibold">Cover Letter</h2>
-                <button onclick="copyToClipboard('cover-letter')" class="text-primary hover:underline text-sm">
-                    Copy
-                </button>
+                <div class="flex gap-3">
+                    <button onclick="copyToClipboard('cover-letter')" class="text-primary hover:underline text-sm">
+                        Copy
+                    </button>
+                    <a href="/applications/{{ name }}/download/cover_letter"
+                       class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                        Download PDF
+                    </a>
+                </div>
             </div>
             <div id="cover-letter" class="p-6 markdown-body whitespace-pre-wrap text-sm overflow-auto max-h-[600px]">{{ cover_letter }}</div>
         </div>

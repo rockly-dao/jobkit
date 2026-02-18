@@ -54,12 +54,26 @@ black .
 - `app.py` - Flask application with routes for all features
 - `templates/` - Jinja2 templates using Tailwind CSS
 
+## LLM Setup
+
+For resume/cover letter generation, configure one of:
+
+**Ollama (free, local)**:
+```bash
+brew install ollama
+ollama pull llama3
+ollama serve  # Keep running in background
+```
+
+**Anthropic/OpenAI (cloud)**: Set API key in Settings page or via environment variable (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`)
+
 ## Key Patterns
 
 - **Provider abstraction**: LLMClient uses a unified interface for different LLM providers
 - **Dataclasses for models**: Job, Config, SearchConfig, LLMConfig
 - **Incremental processing**: Scrapers track existing jobs to avoid duplicates
 - **Local-first**: All data stored in `~/.jobkit/` by default
+- **Multiprocessing for scraping**: Web search uses multiprocessing (not threading) for Playwright compatibility
 
 ## Adding a New Job Board Scraper
 

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Importing Profile - JobKit{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto text-center py-12">
+    <div class="bg-white rounded-lg shadow p-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-6"></div>
+
+        <h1 class="text-2xl font-bold mb-4">Importing LinkedIn Profile</h1>
+
+        <p class="text-gray-600 mb-4">
+            A browser window should have opened. Please log in to LinkedIn if prompted.
+        </p>
+
+        <p class="text-gray-500 text-sm mb-6">
+            This page will automatically update when the import is complete.
+        </p>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+            <p class="text-blue-800 text-sm">
+                <strong>Tips:</strong><br>
+                - Complete the LinkedIn login in the browser window<br>
+                - Wait for your profile page to load<br>
+                - The import will complete automatically
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh every 3 seconds to check status
+setTimeout(function() {
+    window.location.reload();
+}, 3000);
+</script>
+{% endblock %}

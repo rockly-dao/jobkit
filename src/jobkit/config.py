@@ -64,6 +64,7 @@ class Config:
                     "provider": self.llm.provider,
                     "model": self.llm.model,
                     "base_url": self.llm.base_url,
+                    "api_key": self.llm.api_key,
                 }
             }, f, indent=2)
 

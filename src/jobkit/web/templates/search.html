@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Search Jobs - JobKit{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <h1 class="text-2xl font-bold">Search Jobs</h1>
+
+    <!-- Search Form -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <form id="search-form" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Keywords</label>
+                    <input type="text" name="keywords" id="keywords"
+                           value="{{ keywords or '' }}"
+                           class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary"
+                           placeholder="software engineer, data scientist...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input type="text" name="location" id="location"
+                           value="{{ location or 'Remote' }}"
+                           class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary"
+                           placeholder="Remote, San Francisco, New York...">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button type="submit" id="search-btn"
+                        class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                    Search LinkedIn
+                </button>
+                <span id="search-status" class="text-gray-500 text-sm"></span>
+            </div>
+        </form>
+
+        <p class="text-gray-500 text-sm mt-4">
+            Note: A browser window will open for LinkedIn. Log in if prompted, then the search will run automatically.
+        </p>
+    </div>
+
+    <!-- Results -->
+    <div id="results-section" class="hidden">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Search Results</h2>
+            <span id="result-count" class="text-gray-500"></span>
+        </div>
+
+        <div id="results" class="space-y-4">
+            <!-- Results will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Saved Jobs Link -->
+    <div class="text-center">
+        <a href="/jobs" class="text-primary hover:underline">View all saved jobs →</a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const form = document.getElementById('search-form');
+const searchBtn = document.getElementById('search-btn');
+const searchStatus = document.getElementById('search-status');
+const resultsSection = document.getElementById('results-section');
+const resultsDiv = document.getElementById('results');
+const resultCount = document.getElementById('result-count');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const keywords = document.getElementById('keywords').value;
+    const location = document.getElementById('location').value;
+
+    if (!keywords) {
+        alert('Please enter search keywords');
+        return;
+    }
+
+    // Update UI
+    searchBtn.disabled = true;
+    searchBtn.textContent = 'Starting...';
+    searchStatus.innerHTML = '<span class="text-blue-600">Opening browser... Please log in to LinkedIn if prompted.</span>';
+    resultsSection.classList.add('hidden');
+
+    try {
+        // Start the search
+        const response = await fetch('/search/run', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ keywords, location })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        // Poll for results
+        const searchId = data.search_id;
+        searchBtn.textContent = 'Searching...';
+        searchStatus.innerHTML = '<span class="text-blue-600">🔍 Searching LinkedIn... Please complete login if browser opened.</span>';
+
+        await pollForResults(searchId);
+
+    } catch (error) {
+        searchStatus.innerHTML = '<span class="text-red-600">Error: ' + error.message + '</span>';
+        searchBtn.disabled = false;
+        searchBtn.textContent = 'Search LinkedIn';
+    }
+});
+
+async function pollForResults(searchId) {
+    const maxAttempts = 120; // 6 minutes max (120 * 3 seconds)
+    let attempts = 0;
+
+    while (attempts < maxAttempts) {
+        attempts++;
+
+        try {
+            const response = await fetch(`/search/status/${searchId}`);
+            const data = await response.json();
+
+            if (data.status === 'complete') {
+                searchStatus.innerHTML = '<span class="text-green-600">✓ Search complete!</span>';
+                displayResults(data.jobs);
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Search LinkedIn';
+                return;
+            } else if (data.status === 'error') {
+                throw new Error(data.error || 'Search failed');
+            }
+
+            // Still running, update status
+            const dots = '.'.repeat((attempts % 3) + 1);
+            searchStatus.innerHTML = `<span class="text-blue-600">🔍 Searching${dots} (waiting for login/results)</span>`;
+
+        } catch (error) {
+            searchStatus.innerHTML = '<span class="text-red-600">Error: ' + error.message + '</span>';
+            searchBtn.disabled = false;
+            searchBtn.textContent = 'Search LinkedIn';
+            return;
+        }
+
+        // Wait 3 seconds before next poll
+        await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+
+    // Timeout
+    searchStatus.innerHTML = '<span class="text-red-600">Search timed out. Please try again.</span>';
+    searchBtn.disabled = false;
+    searchBtn.textContent = 'Search LinkedIn';
+}
+
+function displayResults(jobs) {
+    resultsSection.classList.remove('hidden');
+    resultCount.textContent = `${jobs.length} jobs found`;
+
+    if (jobs.length === 0) {
+        resultsDiv.innerHTML = '<p class="text-gray-500">No jobs found. Try different keywords.</p>';
+        return;
+    }
+
+    resultsDiv.innerHTML = jobs.map(job => `
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 ${job.saved ? 'border-green-500' : 'border-gray-300'}">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-lg">${escapeHtml(job.title)}</h3>
+                    <p class="text-gray-700">${escapeHtml(job.company)}</p>
+                    <p class="text-gray-500 text-sm">${escapeHtml(job.location)}</p>
+                </div>
+                <div class="flex flex-col gap-2 ml-4">
+                    ${job.saved ? `
+                        <span class="text-green-600 text-sm font-medium">✓ Saved</span>
+                        <a href="/jobs/${job.id}" class="bg-primary text-white px-4 py-2 rounded text-sm text-center hover:bg-blue-700">
+                            View
+                        </a>
+                    ` : `
+                        <button onclick="saveJob('${job.id}')" id="save-btn-${job.id}"
+                                class="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700">
+                            Save Job
+                        </button>
+                    `}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function saveJob(jobId) {
+    const btn = document.getElementById(`save-btn-${jobId}`);
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    try {
+        const response = await fetch(`/search/save/${jobId}`, { method: 'POST' });
+        const data = await response.json();
+
+        if (data.error) {
+            alert('Error: ' + data.error);
+            btn.disabled = false;
+            btn.textContent = 'Save Job';
+        } else {
+            btn.outerHTML = `
+                <span class="text-green-600 text-sm font-medium">✓ Saved</span>
+                <a href="/jobs/${jobId}" class="bg-primary text-white px-4 py-2 rounded text-sm text-center hover:bg-blue-700">
+                    View
+                </a>
+            `;
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+        btn.disabled = false;
+        btn.textContent = 'Save Job';
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text || '';
+    return div.innerHTML;
+}
+</script>
+{% endblock %}

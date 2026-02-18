@@ -1,151 +1,117 @@
 # JobKit
 
-**Open source job hunting toolkit** - Search jobs, generate tailored resumes and cover letters with AI.
+**Open source AI-powered job hunting toolkit**
 
-JobKit automates the tedious parts of job hunting so you can focus on what matters: landing interviews.
+Search jobs, build your profile from multiple sources, and generate tailored resumes and cover letters with AI.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
 ## Features
 
-- **Job Search**: Scrape jobs from LinkedIn (more sources coming)
-- **AI-Powered Generation**: Create tailored resumes and cover letters using local (Ollama) or cloud (Claude, GPT) LLMs
-- **Web Interface**: Clean, simple UI for managing your job search
-- **CLI**: Power user? Use the command line
-- **100% Local**: Your data stays on your machine. No accounts, no tracking.
+- **Job Search** - Search and save jobs from LinkedIn
+- **Multi-Source Profile** - Import from resume (PDF/DOCX), LinkedIn, and GitHub
+- **AI-Powered Generation** - Create tailored resumes and cover letters
+- **PDF Export** - Download professional PDFs ready to submit
+- **Multiple LLM Support** - Ollama (free/local), Anthropic Claude, or OpenAI GPT
+- **100% Local** - Your data stays on your machine
 
 ## Quick Start
 
 ### Install
 
 ```bash
-# Clone the repo
-git clone https://github.com/jobkit/jobkit.git
-cd jobkit
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install
-pip install -e .
-
-# Install browser automation
+pip install jobkit
 playwright install chromium
 ```
 
 ### Run
 
 ```bash
-# Start the web interface
-jobkit web
-
-# Or use the CLI
-jobkit search "software engineer" --location "Remote"
-jobkit list
-jobkit generate JOB_ID
+jobkit web --port 8080
 ```
+
+Open http://localhost:8080 in your browser.
 
 ## Usage
 
-### Web Interface
+### 1. Set Up Your Profile
+
+Import your background from multiple sources:
+- **Upload Resume** - PDF, DOCX, or TXT
+- **LinkedIn** - Import experience and education
+- **GitHub** - Import projects and languages
+
+All sources are merged intelligently.
+
+### 2. Search for Jobs
+
+- Enter keywords and location
+- Browser opens for LinkedIn login (cookies saved for future sessions)
+- Save interesting jobs with one click
+
+### 3. Generate Applications
+
+Click "Generate Application" on any saved job to create:
+- Tailored resume matching the job requirements
+- Compelling cover letter
+- Download as professional PDFs
+
+## LLM Setup
+
+### Ollama (Free, Local) - Recommended
 
 ```bash
-jobkit web
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3
+ollama serve
 ```
 
-Open http://localhost:5000 in your browser.
+### Cloud Providers
 
-1. **Set up your profile**: Add your name, email, and paste your resume
-2. **Search for jobs**: Enter keywords and location, or scrape from LinkedIn
-3. **Generate applications**: Click "Generate" on any job to create a tailored resume and cover letter
+Set your API key in Settings:
+- **Anthropic**: claude-sonnet-4-20250514
+- **OpenAI**: gpt-4
 
-### Command Line
+## CLI Commands
 
 ```bash
-# Search for jobs
-jobkit search "data scientist" --location "New York"
-
-# List saved jobs
+jobkit search "software engineer" --location "Remote"
 jobkit list
-jobkit list --new  # Only show jobs without applications
-
-# Fetch a specific job by LinkedIn URL
-jobkit job https://www.linkedin.com/jobs/view/123456789
-
-# Generate application materials
-jobkit generate 123456789
+jobkit generate JOB_ID
+jobkit config
 ```
 
-## LLM Configuration
-
-JobKit supports multiple LLM providers:
-
-### Ollama (Free, Local)
-
-1. Install Ollama: https://ollama.ai
-2. Pull a model: `ollama pull llama3`
-3. Start Ollama: `ollama serve`
-4. In JobKit settings, select "Ollama" and model "llama3"
-
-### Anthropic Claude
-
-1. Get an API key: https://console.anthropic.com
-2. Set environment variable: `export ANTHROPIC_API_KEY=your-key`
-3. In JobKit settings, select "Anthropic" and model "claude-sonnet-4-20250514"
-
-### OpenAI GPT
-
-1. Get an API key: https://platform.openai.com
-2. Set environment variable: `export OPENAI_API_KEY=your-key`
-3. In JobKit settings, select "OpenAI" and model "gpt-4"
-
-## Docker
+## Development
 
 ```bash
-# Build and run
-docker-compose up -d
-
-# Or just JobKit (without Ollama)
-docker build -t jobkit .
-docker run -p 5000:5000 -v jobkit-data:/data jobkit
+git clone https://github.com/rocky-dao/jobkit.git
+cd jobkit
+python -m venv venv
+source venv/bin/activate
+pip install -e ".[dev]"
+playwright install chromium
 ```
 
-## Project Structure
+## Tech Stack
 
-```
-src/jobkit/
-├── cli.py           # Command-line interface
-├── config.py        # Configuration management
-├── scrapers/        # Job board scrapers
-│   ├── base.py      # Base scraper class
-│   └── linkedin.py  # LinkedIn implementation
-├── generators/      # AI content generators
-│   ├── llm.py       # Multi-provider LLM client
-│   ├── resume.py    # Resume generator
-│   └── cover_letter.py
-└── web/             # Flask web interface
-    ├── app.py
-    └── templates/
-```
+- **Backend**: Python, Flask
+- **Scraping**: Playwright
+- **AI**: Ollama, Anthropic, OpenAI
+- **PDF**: fpdf2
+- **Frontend**: Tailwind CSS
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Priority Areas
-
-- **New job board scrapers**: Indeed, Glassdoor, ZipRecruiter
-- **PDF export**: Professional resume formatting
-- **Test coverage**: We need more tests
-- **UI improvements**: Make it even easier to use
-
-## Disclaimer
-
-This tool is for personal use to assist with job hunting. Be respectful of websites' terms of service. LinkedIn may block automated access - use responsibly.
+Contributions welcome! Areas of interest:
+- New job board scrapers (Indeed, Glassdoor)
+- Profile importers (Twitter, personal websites)
+- UI improvements
 
 ## License
 
-MIT License - see [LICENSE](LICENSE)
+MIT License - free for personal and commercial use.
 
 ---
 
-**Happy job hunting!**
+**Built with AI, for job seekers**

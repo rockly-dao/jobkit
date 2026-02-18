@@ -26,6 +26,9 @@
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
         <div class="flex flex-wrap gap-4">
+            <a href="/search" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                Search Jobs
+            </a>
             <a href="/profile" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                 {% if profile.background %}Edit Profile{% else %}Set Up Profile{% endif %}
             </a>
@@ -67,8 +70,12 @@
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-gray-500">No jobs saved yet. Use the CLI to search for jobs.</p>
-        <pre class="bg-gray-100 p-4 rounded mt-4 text-sm">jobkit search "software engineer" --location "Remote"</pre>
+        <div class="text-center py-8">
+            <p class="text-gray-500 mb-4">No jobs saved yet.</p>
+            <a href="/search" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 inline-block">
+                Search for Jobs
+            </a>
+        </div>
         {% endif %}
     </div>
 

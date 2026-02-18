@@ -55,6 +55,16 @@
                 </p>
             </div>
 
+            <div id="api-key-section">
+                <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                <input type="password" name="api_key" value="{{ config.llm.api_key or '' }}"
+                       class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary"
+                       placeholder="sk-... or your API key">
+                <p class="text-gray-500 text-sm mt-1">
+                    Required for Anthropic and OpenAI. Leave empty for Ollama.
+                </p>
+            </div>
+
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p class="text-blue-800 text-sm">
                     <strong>Using Ollama (recommended for free usage):</strong><br>
