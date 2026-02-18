@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jobkit"
-version = "0.1.0"
+version = "0.1.1"
 description = "Open source job hunting toolkit - search jobs, generate tailored resumes and cover letters"
 readme = "README.md"
 license = {text = "MIT"}
@@ -56,6 +56,9 @@ Issues = "https://github.com/rockly-dao/jobkit/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+jobkit = ["web/templates/*.html", "web/static/**/*"]
 
 [tool.black]
 line-length = 100
